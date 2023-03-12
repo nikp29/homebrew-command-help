@@ -60,6 +60,15 @@ puts "\n"
  
 
 if (options[:run])
+    puts "Would you like to run this command? (y/n)"
+    char = $stdin.gets.chomp
+    while (char != "y")
+        if (char == "n")
+            exit
+        end
+        puts "Please enter y or n"
+        char = $stdin.gets.chomp
+    end
     puts "Running command...\n"
     system(response_command)
 end
