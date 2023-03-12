@@ -1,0 +1,65 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'uri'
+require 'rack'
+require 'net/http'
+require 'json'
+
+options = {}
+
+parser = OptionParser.new do |parser|
+    parser.banner = "Usage: command-help [options] \"description of command you would like\""
+    parser.on("-r", "--run", "Runs the command we generate for you")
+    parser.on("-h", "--help", "prints out help message") do
+        puts parser
+        exit
+    end
+end
+
+parser.parse!(into: options)
+
+cmd = ""
+for arg in ARGV
+  cmd += arg + " "
+end
+
+shell = ENV["SHELL"].split('/')[-1]
+
+key = ""
+file = ""
+if (File.exists?(__dir__+"/gpt-key.txt") && File.size(__dir__+"/gpt-key.txt") > 0)
+    file = File.open(__dir__+"/gpt-key.txt")
+    key = file.read
+else
+    file = File.new(__dir__+"/gpt-key.txt", "w")
+    puts "Please enter your OpenAI API key. If you don't have one, you can get one by creating an OpenAI account and going to https://platform.openai.com/account/api-keys"
+    key = $stdin.gets.chomp
+    file.write(key)
+end
+file.close
+
+prompt_string = "give me a " + shell + " command prompt to " + cmd + "\ngive the answer in the form of a json with the structure:\n{\n\t\"command\": \"\",\n\t\"description\": \"\",\n\t\"language\": \"\"\n}"
+
+uri = URI('https://api.openai.com/v1/chat/completions')
+body = { model: "gpt-3.5-turbo", "messages": [{"role": "user", "content": prompt_string}] }
+headers = { 'Content-Type': 'application/json', 'Authorization': "Bearer " + key }
+response = Net::HTTP.post(uri, body.to_json, headers)
+
+parsed_body = JSON.parse(response.body)
+parsed_message = JSON.parse(parsed_body["choices"][0]["message"]["content"])
+
+response_command = parsed_message["command"]
+response_description = parsed_message["description"]
+
+
+puts "\nTry this command: \n" + response_command
+puts "\nCommand description: \n" + response_description + "\n"
+puts "\n"
+
+ 
+
+if (options[:run])
+    puts "Running command...\n"
+    system(response_command)
+end
