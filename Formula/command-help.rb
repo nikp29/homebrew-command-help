@@ -3,7 +3,7 @@ class CommandHelp < Formula
     homepage "https://github.com/nikp29/homebrew-command-help"
     version "0.1"
   
-    url "https://github.com/github_username/github_repository/archive/main.zip", :using => :curl
+    url "https://github.com/nikp29/homebrew-command-help/archive/refs/tags/Main.zip", :using => :curl
   
     def install
       bin.install "bin/command-help"
