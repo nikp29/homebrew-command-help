@@ -5,6 +5,7 @@ The `command-help` utilizes a simple, step-by-step process to guide users throug
 
 I built this as an *incredibly* simple way to help my friends use the command line.
 ## Installation
+`brew tap nikp29/command-help`
 `brew install command-help`
 
 You will also need an OpenAI Api key, which you can create by making an OpenAI account and visiting [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys).
